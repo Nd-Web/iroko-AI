@@ -1,0 +1,248 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Iroko AI — warm neutral canvas with deep emerald brand + gold accent */
+  --background: oklch(0.99 0.004 120);
+  --foreground: oklch(0.18 0.01 150);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.01 150);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 150);
+  --primary: oklch(0.52 0.13 156);
+  --primary-foreground: oklch(0.99 0.01 150);
+  --secondary: oklch(0.96 0.012 140);
+  --secondary-foreground: oklch(0.25 0.02 156);
+  --muted: oklch(0.965 0.006 140);
+  --muted-foreground: oklch(0.5 0.012 150);
+  --accent: oklch(0.94 0.03 95);
+  --accent-foreground: oklch(0.3 0.05 80);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.91 0.008 140);
+  --input: oklch(0.92 0.008 140);
+  --ring: oklch(0.52 0.13 156);
+  --chart-1: oklch(0.52 0.13 156);
+  --chart-2: oklch(0.75 0.16 80);
+  --chart-3: oklch(0.6 0.12 200);
+  --chart-4: oklch(0.7 0.15 50);
+  --chart-5: oklch(0.55 0.14 130);
+  --sidebar: oklch(0.985 0.005 140);
+  --sidebar-foreground: oklch(0.2 0.01 150);
+  --sidebar-primary: oklch(0.52 0.13 156);
+  --sidebar-primary-foreground: oklch(0.99 0.01 150);
+  --sidebar-accent: oklch(0.95 0.02 150);
+  --sidebar-accent-foreground: oklch(0.25 0.02 156);
+  --sidebar-border: oklch(0.91 0.008 140);
+  --sidebar-ring: oklch(0.52 0.13 156);
+}
+
+.dark {
+  --background: oklch(0.16 0.008 150);
+  --foreground: oklch(0.96 0.005 140);
+  --card: oklch(0.205 0.01 150);
+  --card-foreground: oklch(0.96 0.005 140);
+  --popover: oklch(0.205 0.01 150);
+  --popover-foreground: oklch(0.96 0.005 140);
+  --primary: oklch(0.72 0.15 156);
+  --primary-foreground: oklch(0.16 0.02 156);
+  --secondary: oklch(0.26 0.012 150);
+  --secondary-foreground: oklch(0.96 0.005 140);
+  --muted: oklch(0.24 0.01 150);
+  --muted-foreground: oklch(0.7 0.012 145);
+  --accent: oklch(0.3 0.04 90);
+  --accent-foreground: oklch(0.92 0.05 85);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.72 0.15 156);
+  --chart-1: oklch(0.72 0.15 156);
+  --chart-2: oklch(0.78 0.16 85);
+  --chart-3: oklch(0.65 0.13 200);
+  --chart-4: oklch(0.7 0.16 55);
+  --chart-5: oklch(0.6 0.14 135);
+  --sidebar: oklch(0.185 0.01 150);
+  --sidebar-foreground: oklch(0.96 0.005 140);
+  --sidebar-primary: oklch(0.72 0.15 156);
+  --sidebar-primary-foreground: oklch(0.16 0.02 156);
+  --sidebar-accent: oklch(0.26 0.012 150);
+  --sidebar-accent-foreground: oklch(0.96 0.005 140);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.72 0.15 156);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* ---------- Custom scrollbar ---------- */
+.iroko-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted-foreground) transparent;
+}
+.iroko-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.iroko-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.iroko-scroll::-webkit-scrollbar-thumb {
+  background-color: oklch(from var(--muted-foreground) l c h / 0.35);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.iroko-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: oklch(from var(--muted-foreground) l c h / 0.55);
+}
+
+/* ---------- Markdown prose (chat) ---------- */
+.iroko-prose {
+  @apply text-[0.95rem] leading-7 text-foreground;
+}
+.iroko-prose > *:first-child { margin-top: 0 !important; }
+.iroko-prose > *:last-child { margin-bottom: 0 !important; }
+.iroko-prose p { @apply my-3; }
+.iroko-prose h1 { @apply text-2xl font-semibold mt-6 mb-3; }
+.iroko-prose h2 { @apply text-xl font-semibold mt-5 mb-2.5; }
+.iroko-prose h3 { @apply text-lg font-semibold mt-4 mb-2; }
+.iroko-prose ul { @apply my-3 list-disc space-y-1.5 pl-5; }
+.iroko-prose ol { @apply my-3 list-decimal space-y-1.5 pl-5; }
+.iroko-prose li { @apply leading-7; }
+.iroko-prose li > ul, .iroko-prose li > ol { @apply my-1.5; }
+.iroko-prose a { @apply text-primary underline underline-offset-2 hover:opacity-80; }
+.iroko-prose blockquote {
+  @apply my-3 border-l-2 border-primary/40 pl-4 italic text-muted-foreground;
+}
+.iroko-prose strong { @apply font-semibold; }
+.iroko-prose hr { @apply my-5 border-border; }
+.iroko-prose table {
+  @apply my-4 w-full border-collapse text-sm overflow-hidden rounded-lg;
+}
+.iroko-prose thead { @apply bg-muted; }
+.iroko-prose th, .iroko-prose td {
+  @apply border border-border px-3 py-2 text-left align-top;
+}
+.iroko-prose th { @apply font-semibold; }
+.iroko-prose :not(pre) > code {
+  @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
+}
+
+/* ---------- Streaming caret ---------- */
+.iroko-caret::after {
+  content: "";
+  display: inline-block;
+  width: 0.55rem;
+  height: 1.05rem;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  border-radius: 1px;
+  background-color: var(--primary);
+  animation: iroko-blink 1s steps(2, start) infinite;
+}
+@keyframes iroko-blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* ---------- Fade-in for messages ---------- */
+@keyframes iroko-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.iroko-fade-up { animation: iroko-fade-up 0.28s ease-out both; }
+
+/* ---------- Subtle pulse for thinking dots ---------- */
+@keyframes iroko-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+.iroko-dot { animation: iroko-dot 1.2s infinite ease-in-out; }
+
+/* Textarea autosize base */
+.iroko-textarea {
+  field-sizing: content;
+}
+
+/* ---------- Mobile ergonomics ---------- */
+/* Respect the iPhone home indicator / Android gesture bar. */
+.iroko-safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.5rem);
+}
+.iroko-safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+/* 16px inputs stop iOS Safari from zooming the page on focus. */
+@media (max-width: 640px) {
+  .iroko-textarea {
+    font-size: 1rem;
+  }
+}
+/* Wide markdown tables scroll inside the bubble instead of breaking layout. */
+.iroko-prose table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: nowrap;
+}
+@media (min-width: 640px) {
+  .iroko-prose table {
+    display: table;
+    white-space: normal;
+  }
+}
+/* Chat scroll: no rubber-band chaining into the page behind it. */
+.iroko-scroll {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}

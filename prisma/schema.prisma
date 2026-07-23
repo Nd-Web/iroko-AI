@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  passwordHash  String
+  name          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+  serviceTasks  ServiceTask[]
+
+  // Back-office operator access. The primary operator (env OPERATOR_EMAILS) is
+  // always active and grants everyone else. Others sign up, pick a role, land
+  // in 'pending', and the primary approves → 'active' (or 'revoked').
+  operatorStatus      String    @default("none") // none | pending | active | revoked
+  operatorRole        String? // cac_agent | lawyer | nin_agent | tax_agent | general
+  operatorRequestedAt DateTime?
+  operatorGrantedAt   DateTime?
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String    @default("New chat")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String // 'user' | 'assistant'
+  content        String
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+}
+
+// A service request Iroko executes for the user (the task engine).
+// Status flow:
+//   AWAITING_PAYMENT -> QUEUED -> PROCESSING -> COMPLETED
+//                                            -> NEEDS_HUMAN (escalated to back-office/agent)
+//                                            -> QUEUED (retry with backoff)  -> FAILED (retries exhausted)
+//   any non-terminal -> CANCELLED
+model ServiceTask {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceId   String // id from the AGENT_SERVICES catalog
+  title       String
+  status      String   @default("AWAITING_PAYMENT")
+  // Collected details as a JSON string (SQLite-portable).
+  detailsJson String   @default("{}")
+  // Handler output / delivery artifacts as a JSON string.
+  resultJson  String?
+  // Money — kobo, to avoid float errors. amountKobo = Iroko service fee.
+  amountKobo  Int      @default(0)
+  currency    String   @default("NGN")
+  paymentRef  String?  @unique
+  paidAt      DateTime?
+  // Retry machinery
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(3)
+  runAfter    DateTime @default(now())
+  lockedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  events      TaskEvent[]
+  documents   TaskDocument[]
+
+  @@index([userId, createdAt])
+  @@index([status, runAfter])
+}
+
+// Uploaded supporting documents for a task (e.g. CAC needs a means-of-ID image,
+// passport photograph and signature per proprietor). Bytes stored in-DB so they
+// are self-contained and only ever served through an authorised route — never a
+// public file path. Kept small (images a few hundred KB); not for large files.
+model TaskDocument {
+  id        String      @id @default(cuid())
+  taskId    String
+  task      ServiceTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  kind      String // 'means_of_id' | 'passport_photo' | 'signature' | 'other'
+  label     String // human label shown to the operator
+  filename  String
+  mimeType  String
+  data      Bytes
+  createdAt DateTime    @default(now())
+
+  @@index([taskId])
+}
+
+// Append-only timeline of everything that happened to a task —
+// powers the Uber-style status tracking shown in chat.
+model TaskEvent {
+  id        String      @id @default(cuid())
+  taskId    String
+  task      ServiceTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  type      String // CREATED | PAYMENT | STATUS | NOTE | ERROR
+  message   String
+  dataJson  String?
+  createdAt DateTime    @default(now())
+
+  @@index([taskId, createdAt])
+}
