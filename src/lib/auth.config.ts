@@ -5,6 +5,7 @@ const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCE
 const canonicalUrl = vercelUrl ? `https://${vercelUrl}` : undefined
 
 export const authConfig = {
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'g6GSe5zell1qfZvEtEbkzKT2NUAavo+sOdhyP3BLTCo=',
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
   trustHost: true,
