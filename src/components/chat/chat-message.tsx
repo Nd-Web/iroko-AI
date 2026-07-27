@@ -66,7 +66,7 @@ export function ChatMessageItem({
       <div className="iroko-fade-up flex justify-end px-4 py-2.5 sm:px-6 sm:py-3">
         <div className="max-w-[85%] rounded-3xl rounded-br-lg bg-primary px-4 py-2.5 text-primary-foreground sm:max-w-[70%]">
           <p className="whitespace-pre-wrap break-words text-[0.95rem] leading-7">
-            {message.content}
+            {rawContent}
           </p>
         </div>
       </div>
@@ -97,7 +97,7 @@ export function ChatMessageItem({
                 </div>
               </div>
             ) : (
-              <div className={cn(streaming && message.content.length === 0 && 'iroko-caret')}>
+              <div className={cn(streaming && rawContent.length === 0 && 'iroko-caret')}>
                 {/* Top Banner ONLY for explicit formal documents/letters */}
                 {isDoc && !streaming && (
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/5 p-3 shadow-xs">
@@ -151,7 +151,7 @@ export function ChatMessageItem({
                         <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" style={{ animationDelay: '0.3s' }} />
                       </span>
                     ) : null}
-                    {streaming && message.content.length > 0 && (
+                    {streaming && rawContent.length > 0 && (
                       <span className="iroko-caret" />
                     )}
                   </div>
