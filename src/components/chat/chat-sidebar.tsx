@@ -16,6 +16,7 @@ import {
   FileText,
   LogOut,
   ClipboardList,
+  UserCheck,
 } from 'lucide-react'
 import { IrokoLogo } from '@/components/iroko-logo'
 import { Button } from '@/components/ui/button'
@@ -338,7 +339,17 @@ export function ChatSidebarContent({ onNavigate, onStartFlow }: ChatSidebarConte
       </div>
 
       {/* Footer */}
-      <div className="border-t border-sidebar-border px-3 py-3">
+      <div className="border-t border-sidebar-border px-3 py-3 space-y-2">
+        <a
+          href="/operator"
+          className="flex items-center justify-between gap-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 px-3 py-2 text-xs font-medium text-emerald-500 dark:text-emerald-400 transition-colors"
+        >
+          <span className="flex items-center gap-1.5">
+            <UserCheck className="h-3.5 w-3.5" />
+            Agent Portal & Jobs
+          </span>
+          <span className="text-[10px] opacity-80">Open ↗</span>
+        </a>
         <div className="flex items-center justify-between gap-2 rounded-lg bg-sidebar-accent/50 px-3 py-2">
           <div className="min-w-0">
             <p className="truncate text-xs font-medium">

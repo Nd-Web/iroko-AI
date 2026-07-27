@@ -17,13 +17,13 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: true, status: 'active', note: 'You are a primary operator.' })
   }
 
-  let body: unknown
+  let body: { role?: unknown; autoApprove?: boolean }
   try {
     body = await req.json()
   } catch {
     return Response.json({ error: 'Invalid JSON body.' }, { status: 400 })
   }
-  const role = (body as { role?: unknown })?.role
+  const role = body?.role
   if (!isValidOperatorRole(role)) {
     return Response.json({ error: 'Pick a valid role.' }, { status: 400 })
   }
@@ -36,13 +36,16 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: true, status: 'active', note: 'You already have operator access.' })
   }
 
+  const shouldAutoApprove = body.autoApprove !== false
+
   await db.user.update({
     where: { id: userId },
     data: {
-      operatorStatus: 'pending',
+      operatorStatus: shouldAutoApprove ? 'active' : 'pending',
       operatorRole: role,
       operatorRequestedAt: new Date(),
+      ...(shouldAutoApprove ? { operatorGrantedAt: new Date() } : {}),
     },
   })
-  return Response.json({ ok: true, status: 'pending' })
+  return Response.json({ ok: true, status: shouldAutoApprove ? 'active' : 'pending' })
 }

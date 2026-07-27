@@ -10,6 +10,7 @@ import { ChatMessageItem } from '@/components/chat/chat-message'
 import { ChatComposer } from '@/components/chat/chat-composer'
 import { ThemeToggle } from '@/components/chat/theme-toggle'
 import { VoiceCallMode } from '@/components/chat/voice-call-mode'
+import DataProtectionNotice from '@/components/data-protection-notice'
 import { toast } from '@/hooks/use-toast'
 import { IrokoLogo } from '@/components/iroko-logo'
 import { Button } from '@/components/ui/button'
@@ -285,6 +286,7 @@ export default function Home() {
 
           {/* Composer — floating, safe-area aware */}
           <div className="iroko-safe-bottom shrink-0 bg-background pt-1 sm:pb-3">
+            <DataProtectionNotice />
             <ChatComposer
               onSend={handleSend}
               onStop={stop}

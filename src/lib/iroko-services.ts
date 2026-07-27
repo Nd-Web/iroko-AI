@@ -47,6 +47,10 @@ export interface AgentService {
   /** Which portal an 'online' service is executed on (automation routing). */
   portal?: 'cac' | 'firs' | 'jtb' | 'pencom'
   popular?: boolean
+  /** For concierge-model services: note about how the fee is covered (e.g. subscription). */
+  conciergeNote?: string
+  /** Accreditation/qualification requirement for the agent handling this service. */
+  accreditationNote?: string
 }
 
 export const CATEGORY_LABELS: Record<ServiceCategory, string> = {
@@ -71,30 +75,43 @@ export const ICON_MAP: Record<string, LucideIcon> = {
   Pill,
 }
 
+/**
+ * REGULATORY NOTE — PAYMENTS AT SCALE
+ * Currently: Paystack collects Iroko's own service fees directly from users. Fine.
+ * At scale: If Iroko holds funds to disburse to agents or remit government levies
+ * on behalf of users, this may require CBN agent-banking/PSP licensing.
+ * TODO: Consult Paystack compliance + CBN licensing counsel before Phase 3.
+ * See: CBN Guidelines on Agent Banking, CBN Licensing Framework for PSPs.
+ */
+
 /** The Iroko human-agent network service catalog. */
 export const AGENT_SERVICES: AgentService[] = [
   {
     id: 'nin',
-    name: 'NIN Registration',
+    name: 'NIN Registration (Concierge)',
     category: 'identity',
     description:
-      'Register for your National Identification Number via an agent stationed at a NIMC office near you.',
-    feeMin: 3000,
-    feeMax: 5000,
+      'Iroko\'s concierge service for your NIN — we pre-fill your form, book your NIMC visit, accompany you through the (free) enrollment, and chase your NIN slip. NIMC enrollment itself is always free at all approved centres.',
+    feeMin: 0,
+    feeMax: 0,
+    officialFee: 'Free (NIMC enrollment is free at all approved centres)',
+    conciergeNote: 'Concierge fee covered by your Iroko plan or errand pack',
     duration: '1–3 days',
-    requirements: ['Valid ID or birth certificate', 'Proof of address', 'Biometrics (captured on-site)'],
+    requirements: ['Valid ID or birth certificate', 'Proof of address', 'Biometrics (captured on-site by NIMC)'],
     icon: 'IdCard',
     layer: 'agent',
     popular: true,
   },
   {
     id: 'nin-correction',
-    name: 'NIN Correction',
+    name: 'NIN Correction (Concierge)',
     category: 'identity',
     description:
-      'Correct a name, date of birth or other detail on your existing NIN record.',
-    feeMin: 3000,
-    feeMax: 6000,
+      'Iroko\'s concierge service for correcting your NIN — we prepare your correction request, book your NIMC visit, handle the paperwork, and follow up until it\'s resolved. The NIMC correction process itself is free.',
+    feeMin: 0,
+    feeMax: 0,
+    officialFee: 'Free (NIMC correction processing)',
+    conciergeNote: 'Concierge fee covered by your Iroko plan or errand pack',
     duration: '2–5 days',
     requirements: ['Existing NIN', 'Supporting document for the change', 'Valid ID'],
     icon: 'IdCard',
@@ -105,12 +122,13 @@ export const AGENT_SERVICES: AgentService[] = [
     name: 'CAC Business Registration (LLC)',
     category: 'business',
     description:
-      'Register a Limited Liability Company with CAC — name search, document prep, filing & certificate.',
+      'Register a Limited Liability Company with CAC — name search, document prep, filing & certificate. Handled by a CAC-accredited professional (lawyer, chartered accountant, or chartered secretary) in Iroko\'s network.',
     feeMin: 10000,
     feeMax: 15000,
     // CAC official fees (verify live): ₦1,000 name reservation + ₦10,000 per
     // ₦1,000,000 of share capital + separate FIRS stamp duty on the MEMART.
     officialFee: 'CAC ₦1,000 reservation + ₦10,000 per ₦1M share capital (+ FIRS stamp duty)',
+    accreditationNote: 'Handled by CAC-accredited professionals only',
     duration: '1–2 weeks',
     requirements: [
       '2 proposed business names',
@@ -131,12 +149,13 @@ export const AGENT_SERVICES: AgentService[] = [
     name: 'CAC Business Registration (Sole Proprietor)',
     category: 'business',
     description:
-      'Register a sole proprietorship / enterprise (Business Name) with CAC — the simplest business structure.',
+      'Register a sole proprietorship / enterprise (Business Name) with CAC — the simplest business structure. Handled by a CAC-accredited professional (lawyer, chartered accountant, or chartered secretary) in Iroko\'s network.',
     feeMin: 8000,
     feeMax: 12000,
     // CAC official fees (2025 gazette, verify live): ₦1,000 name reservation
     // + Business Name registration raised to ~₦20,000 from Oct 2025.
     officialFee: 'CAC ₦1,000 name reservation + ~₦20,000 registration',
+    accreditationNote: 'Handled by CAC-accredited professionals only',
     duration: '3–7 days (often near-instant on iCRP)',
     requirements: [
       '2 proposed business names',
@@ -240,9 +259,10 @@ export const AGENT_SERVICES: AgentService[] = [
     name: 'Document Notarization',
     category: 'legal',
     description:
-      'Have affidavits and legal documents notarized by a verified legal agent.',
+      'Have affidavits and legal documents notarized by a Notary Public (appointed by the Chief Justice of Nigeria). Iroko matches you with a verified Notary Public near you — not a general legal practitioner.',
     feeMin: 3000,
     feeMax: 8000,
+    accreditationNote: 'Handled exclusively by appointed Notaries Public — not general legal practitioners',
     duration: '1–2 days',
     requirements: ['Valid ID', 'Document to be notarized', 'Two referees (sometimes)'],
     icon: 'Stamp',
@@ -253,7 +273,7 @@ export const AGENT_SERVICES: AgentService[] = [
     name: 'Contract Generation',
     category: 'legal',
     description:
-      'Generate Nigerian-law-compliant contracts — employment, tenancy, partnership, sales.',
+      'Generate Nigerian-law-aware contract templates — employment, tenancy, partnership, sales. Templates are designed under legal supervision. Review by a qualified lawyer is recommended before signing.',
     feeMin: 0,
     feeMax: 0,
     officialFee: 'Free with Iroko AI',
