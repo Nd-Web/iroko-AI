@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
-import { Loader2, UserCheck, ShieldCheck, IdCard, Building2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { IrokoLogo } from '@/components/iroko-logo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,7 +40,11 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name: name.trim() || undefined,
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -50,9 +54,13 @@ export default function RegisterPage() {
       }
 
       // Auto sign-in right after a successful signup.
-      const signInRes = await signIn('credentials', { email, password, redirect: false })
+      const signInRes = await signIn('credentials', {
+        email: email.trim().toLowerCase(),
+        password,
+        redirect: false,
+      })
       if (!signInRes || signInRes.error) {
-        // Account created — send to login with success flag
+        // Account created but auto sign-in failed — send to login page
         router.push('/login?registered=true')
         return
       }
@@ -61,25 +69,6 @@ export default function RegisterPage() {
     } catch {
       setError('Something went wrong. Please try again.')
       setLoading(false)
-    }
-  }
-
-  const quickLogin = async (quickEmail: string, quickPass: string) => {
-    setLoading(true)
-    try {
-      const res = await signIn('credentials', {
-        email: quickEmail,
-        password: quickPass,
-        redirect: false,
-      })
-      if (res && !res.error) {
-        router.push('/')
-        router.refresh()
-      } else {
-        router.push('/login')
-      }
-    } catch {
-      router.push('/login')
     }
   }
 
@@ -137,54 +126,6 @@ export default function RegisterPage() {
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign up'}
             </Button>
           </form>
-
-          {/* Quick Demo Login Chips */}
-          <div className="mt-6 border-t border-border pt-4">
-            <p className="mb-2 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Or Use 1-Click Test Accounts
-            </p>
-            <div className="grid grid-cols-2 gap-1.5">
-              <button
-                type="button"
-                onClick={() => quickLogin('customer@iroko.ng', 'Password123!')}
-                disabled={loading}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 p-2 text-left text-xs font-medium transition-colors hover:bg-accent"
-              >
-                <UserCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                <span className="truncate">Customer</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('cac.agent@iroko.ng', 'Password123!')}
-                disabled={loading}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 p-2 text-left text-xs font-medium transition-colors hover:bg-accent"
-              >
-                <Building2 className="h-3.5 w-3.5 text-blue-500 shrink-0" />
-                <span className="truncate">CAC Agent</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('nin.agent@iroko.ng', 'Password123!')}
-                disabled={loading}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 p-2 text-left text-xs font-medium transition-colors hover:bg-accent"
-              >
-                <IdCard className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                <span className="truncate">NIN Agent</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('admin@iroko.ng', 'Password123!')}
-                disabled={loading}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 p-2 text-left text-xs font-medium transition-colors hover:bg-accent"
-              >
-                <ShieldCheck className="h-3.5 w-3.5 text-purple-500 shrink-0" />
-                <span className="truncate">Admin</span>
-              </button>
-            </div>
-          </div>
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
             Already have an account?{' '}
