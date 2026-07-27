@@ -48,12 +48,12 @@ export function useIrokoChat(): UseIrokoChatResult {
     const conv = useChatStore
       .getState()
       .conversations.find((c) => c.id === convId)
-    if (!conv) return []
+    if (!conv || !Array.isArray(conv.messages)) return []
     return conv.messages
-      .filter((m) => m.role === 'user' || m.role === 'assistant')
+      .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
       .map((m) => ({
         role: m.role as 'user' | 'assistant',
-        content: m.content,
+        content: m.content || '',
       }))
   }
 

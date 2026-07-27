@@ -67,8 +67,10 @@ function groupByDate(convs: Conversation[]) {
     { label: 'Previous 7 days', items: [] },
     { label: 'Older', items: [] },
   ]
-  for (const c of convs) {
-    const age = now - c.updatedAt
+  for (const c of convs || []) {
+    if (!c) continue
+    const updatedAt = typeof c.updatedAt === 'number' && !isNaN(c.updatedAt) ? c.updatedAt : Date.now()
+    const age = now - updatedAt
     if (age < day) groups[0].items.push(c)
     else if (age < 7 * day) groups[1].items.push(c)
     else groups[2].items.push(c)
@@ -116,13 +118,17 @@ export function ChatSidebarContent({ onNavigate, onStartFlow }: ChatSidebarConte
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase()
     const list = q
-      ? conversations.filter(
-          (c) =>
-            c.title.toLowerCase().includes(q) ||
-            c.messages.some((m) => m.content.toLowerCase().includes(q)),
-        )
+      ? conversations.filter((c) => {
+          const titleMatch = typeof c?.title === 'string' && c.title.toLowerCase().includes(q)
+          const msgMatch =
+            Array.isArray(c?.messages) &&
+            c.messages.some(
+              (m) => typeof m?.content === 'string' && m.content.toLowerCase().includes(q),
+            )
+          return titleMatch || msgMatch
+        })
       : conversations
-    return [...list].sort((a, b) => b.updatedAt - a.updatedAt)
+    return [...(list || [])].sort((a, b) => (b?.updatedAt || 0) - (a?.updatedAt || 0))
   }, [conversations, query])
 
   const groups = React.useMemo(() => groupByDate(filtered), [filtered])
