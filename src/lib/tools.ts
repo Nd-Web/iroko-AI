@@ -19,6 +19,7 @@ import { initializePayment, paymentsMode } from './paystack'
 import { addTaskEvent, markTaskPaid, TERMINAL_STATUSES } from './task-engine'
 import { webSearch } from './web-search'
 import { fetchReadable } from './web-fetch'
+import { searchNigerianLaw } from './rag-legal-knowledge'
 
 export interface ToolContext {
   userId: string | null
@@ -196,6 +197,24 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
           url: { type: 'string', description: 'The full http/https URL to read.' },
         },
         required: ['url'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'search_nigerian_law',
+      description:
+        'Search statutory Nigerian laws (CAMA 2020, Lagos State Tenancy Law 2011, Labour Act Cap L1, NDPA 2023, PITA/VAT Tax Acts) for exact legal section citations, statutory notice periods, minimum share capital, and legal rights. ALWAYS use this when answering legal or compliance questions.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: 'Keywords to search (e.g., "tenancy notice quit", "cama share capital", "labour termination notice", "vat rate").',
+          },
+        },
+        required: ['query'],
       },
     },
   },
@@ -576,6 +595,26 @@ const executors: Record<string, ToolExecutor> = {
       truncated: res.truncated,
       text: res.text,
       instruction: 'Summarise/quote only what is on the page. Cite this URL. If it did not answer the question, say so.',
+    }
+  },
+
+  async search_nigerian_law(args) {
+    const query = str(args.query).trim()
+    if (!query) return { error: 'query is required.' }
+    const snippets = searchNigerianLaw(query)
+    return {
+      query,
+      found: snippets.length,
+      statutes: snippets.map((s) => ({
+        act: s.act,
+        section: s.section,
+        title: s.title,
+        content: s.content,
+      })),
+      instruction:
+        snippets.length > 0
+          ? 'Cite the Act name and exact Section number in your response to the user.'
+          : 'No specific statutory snippet matched. Fall back to general Nigerian legal knowledge or use web_search.',
     }
   },
 }

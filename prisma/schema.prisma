@@ -98,3 +98,16 @@ model TaskEvent {
 
   @@index([taskId, createdAt])
 }
+
+model SignatureRequest {
+  id               String   @id @default(cuid())
+  docTitle         String
+  signerName       String
+  signerEmail      String?
+  signatureDataUrl String
+  ipAddress        String?
+  verificationHash String   @unique
+  signedAt         DateTime @default(now())
+
+  @@index([verificationHash])
+}
