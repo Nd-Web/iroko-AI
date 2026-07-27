@@ -6,7 +6,6 @@
  * for electronically signed contracts and agreements.
  */
 
-import { v4 as uuidv4 } from 'uuid'
 
 export interface ESignatureData {
   id: string
@@ -52,7 +51,7 @@ export function createESignatureRecord(
   const verificationHash = generateVerificationHash(docTitle, signerName, signedAt)
 
   return {
-    id: uuidv4(),
+    id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
     docTitle,
     signerName,
     signerEmail,

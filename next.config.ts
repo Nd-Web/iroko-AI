@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   // Optional runtime-only dependency (portal automation workers). Keeping it
   // external stops the bundler from trying to resolve it at build time.
   serverExternalPackages: ["playwright"],
+  transpilePackages: ["remark-gfm", "@react-pdf/renderer", "docx"],
 };
 
 export default nextConfig;
