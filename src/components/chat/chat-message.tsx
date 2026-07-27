@@ -1,12 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import { Check, Copy, RefreshCw, AlertTriangle } from 'lucide-react'
+import { Check, Copy, RefreshCw, AlertTriangle, FileText, FileDown, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Markdown } from './markdown'
 import { SpeakButton } from './speak-button'
 import { IrokoLogo } from '@/components/iroko-logo'
 import { extractQuickReplies } from '@/lib/quick-replies'
+import { isLegalDocument, downloadAsWord, downloadAsPdf, extractDocTitle } from '@/lib/document-exporter'
 import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/lib/types'
 
@@ -35,6 +36,9 @@ export function ChatMessageItem({
     () => (isUser ? { body: message.content, options: [] } : extractQuickReplies(message.content)),
     [isUser, message.content],
   )
+
+  const isDoc = React.useMemo(() => !isUser && isLegalDocument(body), [isUser, body])
+  const docTitle = React.useMemo(() => (isDoc ? extractDocTitle(body) : 'Legal_Document'), [isDoc, body])
 
   const copy = React.useCallback(async () => {
     try {
@@ -83,18 +87,51 @@ export function ChatMessageItem({
             </div>
           ) : (
             <div className={cn(streaming && message.content.length === 0 && 'iroko-caret')}>
-              {body ? (
-                <Markdown content={body} />
-              ) : streaming ? (
-                <span className="inline-flex items-center gap-1 text-muted-foreground">
-                  <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" />
-                  <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" style={{ animationDelay: '0.15s' }} />
-                  <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" style={{ animationDelay: '0.3s' }} />
-                </span>
-              ) : null}
-              {streaming && message.content.length > 0 && (
-                <span className="iroko-caret" />
+              {/* If this is a generated legal agreement, show a 1-Click Document Banner */}
+              {isDoc && !streaming && (
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/5 p-3 shadow-xs">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+                    <FileText className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <span className="truncate max-w-[200px] sm:max-w-[300px]">{docTitle}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadAsWord(body, docTitle)}
+                      className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
+                    >
+                      <FileDown className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                      <span>Download Word (.doc)</span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadAsPdf(body, docTitle)}
+                      className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
+                    >
+                      <Download className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <span>Download PDF</span>
+                    </Button>
+                  </div>
+                </div>
               )}
+
+              {/* Render document inside an artifact paper card if it is a legal document */}
+              <div className={cn(isDoc && 'rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs')}>
+                {body ? (
+                  <Markdown content={body} />
+                ) : streaming ? (
+                  <span className="inline-flex items-center gap-1 text-muted-foreground">
+                    <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" />
+                    <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" style={{ animationDelay: '0.15s' }} />
+                    <span className="iroko-dot h-1.5 w-1.5 rounded-full bg-current" style={{ animationDelay: '0.3s' }} />
+                  </span>
+                ) : null}
+                {streaming && message.content.length > 0 && (
+                  <span className="iroko-caret" />
+                )}
+              </div>
             </div>
           )}
 
@@ -118,7 +155,7 @@ export function ChatMessageItem({
             </div>
           )}
 
-          {/* Actions — quiet until you need them (always visible on touch) */}
+          {/* Actions — quiet until you need them */}
           {!streaming && !message.error && body && (
             <div
               className={cn(
@@ -135,6 +172,30 @@ export function ChatMessageItem({
                 {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                 {copied ? 'Copied' : 'Copy'}
               </Button>
+
+              {isDoc && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => downloadAsWord(body, docTitle)}
+                    className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <FileDown className="h-3.5 w-3.5 text-blue-500" />
+                    Word
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => downloadAsPdf(body, docTitle)}
+                    className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    <Download className="h-3.5 w-3.5 text-emerald-500" />
+                    PDF
+                  </Button>
+                </>
+              )}
+
               <SpeakButton text={body} />
               {isLastAssistant && onRegenerate && (
                 <Button
