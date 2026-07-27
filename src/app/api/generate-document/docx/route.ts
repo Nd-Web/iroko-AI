@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
         if (part.startsWith('**') && part.endsWith('**')) {
           runs.push(new TextRun({ text: part.slice(2, -2), bold: true }))
         } else if (part.startsWith('*') && part.endsWith('*')) {
-          runs.push(new TextRun({ text: part.slice(1, -1), italic: true }))
+          runs.push(new TextRun({ text: part.slice(1, -1), italics: true }))
         } else {
           runs.push(new TextRun({ text: part }))
         }
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       children.push(
         new Paragraph({
           children: runs,
-          alignment: AlignmentType.JUSTIFY,
+          alignment: AlignmentType.JUSTIFIED,
           spacing: { after: 120, line: 276 },
         }),
       )
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, '_')
       .replace(/^_|_$/g, '')
 
-    return new NextResponse(buffer, {
+    return new NextResponse(buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type':

@@ -132,7 +132,7 @@ function buildDocxParagraphs(
       if (part.startsWith('**') && part.endsWith('**')) {
         runs.push(new TextRun({ text: part.slice(2, -2), bold: true }))
       } else if (part.startsWith('*') && part.endsWith('*')) {
-        runs.push(new TextRun({ text: part.slice(1, -1), italic: true }))
+        runs.push(new TextRun({ text: part.slice(1, -1), italics: true }))
       } else {
         runs.push(new TextRun({ text: part }))
       }
@@ -261,7 +261,7 @@ function buildDocxParagraphs(
     children.push(
       new Paragraph({
         children: parseInlineRuns(line),
-        alignment: AlignmentType.JUSTIFY,
+        alignment: AlignmentType.JUSTIFIED,
         spacing: { after: 120, line: 276 },
       }),
     )

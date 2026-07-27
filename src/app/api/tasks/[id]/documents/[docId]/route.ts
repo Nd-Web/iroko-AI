@@ -30,7 +30,7 @@ export async function GET(
     where: { id: docId, taskId: id },
     select: { filename: true, mimeType: true, data: true },
   })
-  if (!doc) return Response.json({ error: 'Document not found.' }, { status: 404 })
+  if (!doc || !doc.data) return Response.json({ error: 'Document not found.' }, { status: 404 })
 
   const body = new Uint8Array(doc.data)
   return new Response(body, {
