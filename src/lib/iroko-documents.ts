@@ -167,10 +167,12 @@ export function buildDocGenerationPrompt(template: DocTemplate, values: Record<s
     `Drafting guidance:`,
     template.draftingNotes,
     ``,
-    `Format the document in clean Markdown with a title, numbered clauses/sections, and signature blocks at the end ` +
-      `where applicable. Use ₦ for naira. At the very end of the document, include this exact legal disclaimer ` +
-      `in italics as a separate section titled "Disclaimer":`,
+    `CRITICAL RULES:`,
+    `1. Use ALL the real values provided above. NEVER use placeholder brackets like [Name], [Date], [Address]. Every field must be filled with the actual value. The document must be READY TO PRINT AND SEND.`,
+    `2. If a field says "(not provided)", use a reasonable default or today's date (${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}).`,
+    `3. Format the document in clean Markdown with a level-1 heading in ALL CAPS, numbered clauses/sections, and signature blocks using the REAL party names.`,
+    `4. After the signature block, add a "---" horizontal rule, then on the next line put this disclaimer in italics:`,
     ``,
-    `"${LEGAL_DISCLAIMER}"`,
+    `*${LEGAL_DISCLAIMER}*`,
   ].join('\n')
 }
