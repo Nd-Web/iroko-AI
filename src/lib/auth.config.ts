@@ -1,5 +1,9 @@
 import type { NextAuthConfig } from 'next-auth'
 
+// On Vercel, automatically resolve the Vercel domain if AUTH_URL was accidentally set to localhost
+const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
+const canonicalUrl = vercelUrl ? `https://${vercelUrl}` : undefined
+
 export const authConfig = {
   session: { strategy: 'jwt' },
   pages: { signIn: '/login' },
