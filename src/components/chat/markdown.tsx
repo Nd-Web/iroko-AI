@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { CodeBlock } from './code-block'
 import { cn } from '@/lib/utils'
 
@@ -43,12 +43,45 @@ export function Markdown({ content, className }: MarkdownProps) {
   return (
     <div className={cn('iroko-prose', className)}>
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
           pre: PreBlock,
           a: ({ href, children }) => (
             <a href={href} target="_blank" rel="noopener noreferrer">
               {children}
             </a>
+          ),
+          table: ({ children }) => (
+            <div className="my-4 w-full overflow-x-auto rounded-xl border border-border bg-card shadow-xs">
+              <table className="w-full text-left text-xs border-collapse">
+                {children}
+              </table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="border-b border-border bg-muted/60 font-semibold text-foreground">
+              {children}
+            </thead>
+          ),
+          tbody: ({ children }) => (
+            <tbody className="divide-y divide-border/60 bg-background text-foreground/90">
+              {children}
+            </tbody>
+          ),
+          tr: ({ children }) => (
+            <tr className="transition-colors hover:bg-muted/30">
+              {children}
+            </tr>
+          ),
+          th: ({ children }) => (
+            <th className="px-3.5 py-2.5 font-semibold text-foreground">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="px-3.5 py-2.5 text-xs text-foreground/90 leading-normal">
+              {children}
+            </td>
           ),
         }}
       >
