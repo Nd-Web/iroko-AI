@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Check, Copy, RefreshCw, AlertTriangle, FileText, FileDown, Download } from 'lucide-react'
+import { Check, Copy, RefreshCw, AlertTriangle, FileText, FileDown, Download, HelpCircle, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Markdown } from './markdown'
 import { SpeakButton } from './speak-button'
@@ -135,23 +135,30 @@ export function ChatMessageItem({
             </div>
           )}
 
-          {/* Quick replies — tappable chat-first buttons */}
+          {/* Interactive Question Choice Card (Claude-style Options Wizard) */}
           {showQuickReplies && (
-            <div className="iroko-fade-up mt-3 flex flex-wrap gap-2">
-              {options.map((o) => (
-                <button
-                  key={o}
-                  type="button"
-                  onClick={() => onQuickReply?.(o)}
-                  className={cn(
-                    'min-h-9 rounded-full border border-primary/25 bg-primary/5 px-4 py-2 text-sm font-medium leading-none text-primary',
-                    'transition-all hover:bg-primary/10 active:scale-[0.97]',
-                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
-                  )}
-                >
-                  {o}
-                </button>
-              ))}
+            <div className="iroko-fade-up mt-3.5 rounded-2xl border border-primary/20 bg-primary/5 p-3.5 shadow-xs">
+              <div className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold text-primary">
+                <HelpCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span>Select an option to answer:</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {options.map((o) => (
+                  <button
+                    key={o}
+                    type="button"
+                    onClick={() => onQuickReply?.(o)}
+                    className={cn(
+                      'inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-primary/30 bg-card px-3.5 py-2 text-xs font-medium text-foreground shadow-2xs',
+                      'transition-all hover:border-primary hover:bg-primary/10 hover:text-primary active:scale-[0.98]',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
+                    )}
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>{o}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
