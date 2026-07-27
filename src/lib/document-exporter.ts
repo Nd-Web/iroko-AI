@@ -1,34 +1,37 @@
 /**
  * Client-side Document Exporter for Iroko AI.
- * Enables 1-click download of generated legal contracts and agreements
+ * Enables 1-click download of generated legal contracts, formal letters, and agreements
  * as Microsoft Word (.doc/.docx) or formatted PDF.
  */
 
-/** Check if text content looks like a legal document or formal agreement. */
+/** Check if text content is a formal legal document, contract, or formal letter. */
 export function isLegalDocument(text: string): boolean {
-  if (!text || text.length < 200) return false
+  if (!text || text.length < 150) return false
+
+  // 1. Check for explicit document heading at start or section (# Formal Letter, # Agreement, etc.)
+  const hasDocHeading = /^#\s+.*(agreement|contract|letter|notice|memorandum|resolution|deed|invoice|affidavit|declaration|demand)/im.test(text)
+  if (hasDocHeading) return true
+
+  // 2. Check for formal letter structural elements
+  const hasLetterStructure =
+    (text.includes('Dear ') || text.includes('RE:') || text.includes('Subject:')) &&
+    (text.includes('Yours faithfully') || text.includes('Yours sincerely') || text.includes('[Your Signature]')) &&
+    (text.includes('[Date]') || text.includes('[Your Name]') || text.includes('[Landlord'))
+  if (hasLetterStructure) return true
+
+  // 3. Check for formal contract / legal agreement structural elements
   const lower = text.toLowerCase()
-  const indicators = [
-    'agreement',
-    'contract',
-    'memorandum',
-    'power of attorney',
-    'resolution',
-    'affidavit',
-    'invoice',
-    'tenancy',
-    'employment',
-    'partnership',
-    'disclaimer',
-    'signature block',
-    'whereas',
+  const contractKeywords = [
     'in witness whereof',
+    'signature block',
+    'now it is hereby agreed',
+    'terms and conditions',
+    'legal disclaimer',
   ]
-  let matches = 0
-  for (const ind of indicators) {
-    if (lower.includes(ind)) matches++
-  }
-  return matches >= 2 || /^#\s+.*(agreement|contract|memorandum|resolution|deed|invoice|affidavit)/i.test(text)
+  const matchCount = contractKeywords.filter((k) => lower.includes(k)).length
+  if (matchCount >= 2) return true
+
+  return false
 }
 
 /** Extract document title from markdown heading or first line. */
@@ -37,11 +40,17 @@ export function extractDocTitle(text: string): string {
   if (match && match[1]) {
     return match[1].replace(/[*_#]/g, '').trim()
   }
+
+  const letterSubj = text.match(/(?:Subject|RE):\s*(.+)$/im)
+  if (letterSubj && letterSubj[1]) {
+    return letterSubj[1].replace(/[*_#]/g, '').trim().slice(0, 50)
+  }
+
   const lines = text.split('\n').filter((l) => l.trim().length > 0)
   if (lines[0]) {
     return lines[0].replace(/[*_#]/g, '').trim().slice(0, 50)
   }
-  return 'Iroko_Legal_Document'
+  return 'Iroko_Document'
 }
 
 /** Convert Markdown plain text into clean HTML body for document rendering. */

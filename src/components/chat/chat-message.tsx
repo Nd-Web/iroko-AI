@@ -38,7 +38,7 @@ export function ChatMessageItem({
   )
 
   const isDoc = React.useMemo(() => !isUser && isLegalDocument(body), [isUser, body])
-  const docTitle = React.useMemo(() => (isDoc ? extractDocTitle(body) : 'Legal_Document'), [isDoc, body])
+  const docTitle = React.useMemo(() => extractDocTitle(body), [body])
 
   const copy = React.useCallback(async () => {
     try {
@@ -87,7 +87,7 @@ export function ChatMessageItem({
             </div>
           ) : (
             <div className={cn(streaming && message.content.length === 0 && 'iroko-caret')}>
-              {/* If this is a generated legal agreement, show a 1-Click Document Banner */}
+              {/* Top Banner ONLY for explicit formal documents/letters */}
               {isDoc && !streaming && (
                 <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/5 p-3 shadow-xs">
                   <div className="flex items-center gap-2 text-xs font-semibold text-primary">
@@ -117,7 +117,7 @@ export function ChatMessageItem({
                 </div>
               )}
 
-              {/* Render document inside an artifact paper card if it is a legal document */}
+              {/* Render document inside an artifact paper card if it is an explicit document */}
               <div className={cn(isDoc && 'rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs')}>
                 {body ? (
                   <Markdown content={body} />
@@ -155,11 +155,11 @@ export function ChatMessageItem({
             </div>
           )}
 
-          {/* Actions — quiet until you need them */}
+          {/* On-Demand Document Actions for EVERY Assistant Message */}
           {!streaming && !message.error && body && (
             <div
               className={cn(
-                'mt-1.5 flex items-center gap-0.5 transition-opacity',
+                'mt-1.5 flex items-center gap-1 transition-opacity flex-wrap',
                 !isLastAssistant && 'sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100',
               )}
             >
@@ -173,30 +173,31 @@ export function ChatMessageItem({
                 {copied ? 'Copied' : 'Copy'}
               </Button>
 
-              {isDoc && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => downloadAsWord(body, docTitle)}
-                    className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    <FileDown className="h-3.5 w-3.5 text-blue-500" />
-                    Word
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => downloadAsPdf(body, docTitle)}
-                    className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
-                  >
-                    <Download className="h-3.5 w-3.5 text-emerald-500" />
-                    PDF
-                  </Button>
-                </>
-              )}
+              {/* On-Demand Word & PDF Export for ANY reply */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => downloadAsWord(body, docTitle)}
+                className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                title="Export message as Word document"
+              >
+                <FileDown className="h-3.5 w-3.5 text-blue-500" />
+                <span>Word</span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => downloadAsPdf(body, docTitle)}
+                className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
+                title="Export message as PDF document"
+              >
+                <Download className="h-3.5 w-3.5 text-emerald-500" />
+                <span>PDF</span>
+              </Button>
 
               <SpeakButton text={body} />
+
               {isLastAssistant && onRegenerate && (
                 <Button
                   variant="ghost"
