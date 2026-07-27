@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
-  /* config options here */
+  // Use standalone output for Docker/VPS, but let Vercel optimize natively
+  ...(process.env.VERCEL ? {} : { output: "standalone" }),
   typescript: {
     ignoreBuildErrors: true,
   },
