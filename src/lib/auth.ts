@@ -2,20 +2,10 @@ import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
+import { authConfig } from './auth.config'
 
-/**
- * Email/password auth via Auth.js v5. Sessions are JWT-based (no session
- * table needed) — this is the only strategy Auth.js supports with a
- * Credentials provider anyway.
- *
- * Magic-link sign-in can be added later as a second provider once an email
- * service (Resend, Postmark, etc.) is picked — it just needs API keys we
- * don't have yet, so it's deliberately left out for now.
- */
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  session: { strategy: 'jwt' },
-  pages: { signIn: '/login' },
-  trustHost: true,
+  ...authConfig,
   providers: [
     Credentials({
       name: 'credentials',
@@ -39,16 +29,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.uid = (user as { id: string }).id
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user && token.uid) {
-        ;(session.user as { id?: string }).id = token.uid as string
-      }
-      return session
-    },
-  },
 })

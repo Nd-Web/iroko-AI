@@ -1,5 +1,8 @@
-import { auth } from '@/lib/auth'
+import NextAuth from 'next-auth'
+import { authConfig } from '@/lib/auth.config'
 import { NextResponse } from 'next/server'
+
+const { auth } = NextAuth(authConfig)
 
 const PUBLIC_PATHS = ['/login', '/register']
 
@@ -8,8 +11,6 @@ export default auth((req) => {
   const isPublic =
     PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`)) ||
     pathname.startsWith('/api/auth') ||
-    // Paystack server-to-server webhook + checkout redirect (both verify
-    // the transaction cryptographically/server-side themselves).
     pathname.startsWith('/api/payments/')
 
   if (!req.auth && !isPublic) {
@@ -24,6 +25,5 @@ export default auth((req) => {
 })
 
 export const config = {
-  // Run on everything except static assets / images / the favicon.
   matcher: ['/((?!_next/static|_next/image|favicon.ico|logo.svg).*)'],
 }
