@@ -124,11 +124,11 @@ export const DOC_TEMPLATES: DocTemplate[] = [
   {
     id: 'memorandum',
     name: 'Company Memorandum (preview)',
-    description: 'Preview CAC Memorandum of Understanding for an LLC.',
+    description: 'Preview CAC Memorandum of Association for an LLC under CAMA 2020.',
     icon: 'FileText',
     category: 'business',
     draftingNotes:
-      'Draft a CAC-style Memorandum of Association for a private company limited by shares (Form CAC 1.1 era). ' +
+      'Draft a CAC-style Memorandum of Association for a private company limited by shares under CAMA 2020. ' +
       'Include the company name clause, registered office (Lagos/Abuja/etc.), objects clause, ' +
       'share capital (minimum ₦100,000 authorised for LLC), subscribers, and their shares. ' +
       'Mark clearly this is a draft preview to be confirmed by a legal agent.',
@@ -138,6 +138,59 @@ export const DOC_TEMPLATES: DocTemplate[] = [
       { id: 'objects', label: 'Main business objects', kind: 'textarea', placeholder: 'To carry on the business of technology services, software development and consulting.', required: true },
       { id: 'capital', label: 'Authorised share capital (₦)', kind: 'money', placeholder: '1,000,000', default: '1,000,000', required: true },
       { id: 'subscribers', label: 'Subscribers (name, address, shares)', kind: 'textarea', placeholder: '1. Ngozi Eze, Lagos — 500,000 shares\n2. Tunde Bello, Lagos — 500,000 shares', required: true },
+    ],
+  },
+  {
+    id: 'nda',
+    name: 'Non-Disclosure Agreement (NDA)',
+    description: 'Mutual or One-Way Non-Disclosure and Confidentiality Agreement under Nigerian law.',
+    icon: 'Lock',
+    category: 'legal',
+    draftingNotes:
+      'Draft a Non-Disclosure Agreement (NDA) compliant with Nigerian commercial contract law and the Nigeria Data Protection Act (NDPA) 2023. ' +
+      'Include disclosing party, receiving party, purpose of disclosure, definition of confidential information, ' +
+      'exclusions, duration of confidentiality (typically 2-5 years), remedies for breach, governing law (Courts of Nigeria), and execution signature blocks.',
+    fields: [
+      { id: 'disclosingParty', label: 'Disclosing Party name & address', kind: 'text', placeholder: 'Iroko AI Tech Ltd, Ikeja, Lagos', required: true },
+      { id: 'receivingParty', label: 'Receiving Party name & address', kind: 'text', placeholder: 'Apex Ventures Nigeria, Victoria Island, Lagos', required: true },
+      { id: 'ndaType', label: 'Agreement Type', kind: 'select', options: ['Mutual (Two-way)', 'One-Way'], default: 'Mutual (Two-way)' },
+      { id: 'purpose', label: 'Purpose of disclosure', kind: 'textarea', placeholder: 'Exploration of potential strategic partnership and software integration', required: true },
+      { id: 'duration', label: 'Confidentiality period', kind: 'select', options: ['2 years', '3 years', '5 years', 'Perpetual'], default: '3 years' },
+    ],
+  },
+  {
+    id: 'powerOfAttorney',
+    name: 'Power of Attorney',
+    description: 'General or Special Power of Attorney for property, CAC, or administrative representation in Nigeria.',
+    icon: 'Scale',
+    category: 'legal',
+    draftingNotes:
+      'Draft a formal Power of Attorney instrument under Nigerian property and agency law. ' +
+      'Include Donor (principal), Donee (attorney-in-fact), specific powers conferred (e.g. CAC registration, land administration, court appearance), ' +
+      'revocability, date of execution, and witness signature blocks under seal.',
+    fields: [
+      { id: 'donor', label: 'Donor (Principal) full name & address', kind: 'text', placeholder: 'Chief Emeka Okonkwo, Ikoyi, Lagos', required: true },
+      { id: 'donee', label: 'Donee (Attorney) full name & address', kind: 'text', placeholder: 'Barr. Folake Adeleke, Ikeja, Lagos', required: true },
+      { id: 'poaScope', label: 'Scope of Powers', kind: 'textarea', placeholder: 'To represent the Donor before the Corporate Affairs Commission (CAC) and sign incorporation documents on Donor behalf.', required: true },
+      { id: 'effectiveDate', label: 'Effective Date', kind: 'date' },
+    ],
+  },
+  {
+    id: 'boardResolution',
+    name: 'Board Resolution',
+    description: 'Formal company board resolution for corporate bank account opening or director authorization.',
+    icon: 'Building',
+    category: 'business',
+    draftingNotes:
+      'Draft a formal Board Resolution under CAMA 2020. ' +
+      'Include company name, RC number, date of meeting, directors present, specific resolutions passed (e.g., opening a bank account with Access Bank/GTBank, authorized signatories), ' +
+      'and signatures of the Director and Company Secretary.',
+    fields: [
+      { id: 'companyName', label: 'Company name & RC Number', kind: 'text', placeholder: 'Zeta Synergy Ltd (RC: 1234567)', required: true },
+      { id: 'resolutionTitle', label: 'Resolution Subject', kind: 'text', placeholder: 'Opening of Corporate Bank Account & Mandate Approval', required: true },
+      { id: 'bankName', label: 'Bank Name & Branch (if applicable)', kind: 'text', placeholder: 'Guaranty Trust Bank (GTBank), Lekki Branch' },
+      { id: 'signatories', label: 'Authorized Signatories & Mandate (Category A/B)', kind: 'textarea', placeholder: '1. Mr. Tunde Bakare (Managing Director) - Category A\n2. Mrs. Chioma Nnadi (Director) - Category B', required: true },
+      { id: 'meetingDate', label: 'Date of Board Meeting', kind: 'date' },
     ],
   },
 ]

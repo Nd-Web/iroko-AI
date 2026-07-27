@@ -8,6 +8,7 @@ import { SpeakButton } from './speak-button'
 import { IrokoLogo } from '@/components/iroko-logo'
 import { extractQuickReplies } from '@/lib/quick-replies'
 import { isLegalDocument, downloadAsWord, downloadAsPdf, extractDocTitle } from '@/lib/document-exporter'
+import { DocumentPreviewModal } from '@/components/documents/document-preview-modal'
 import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/lib/types'
 
@@ -70,52 +71,69 @@ export function ChatMessageItem({
     )
   }
 
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false)
+
   return (
-    <div className="iroko-fade-up group px-4 py-2.5 sm:px-6 sm:py-3">
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/15 sm:flex">
-          <IrokoLogo size={20} />
-        </div>
-        <div className="min-w-0 flex-1 pt-0.5">
-          {message.error ? (
-            <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-              <div>
-                <p className="font-medium">Something went wrong</p>
-                <p className="text-destructive/80">{message.error}</p>
-              </div>
-            </div>
-          ) : (
-            <div className={cn(streaming && message.content.length === 0 && 'iroko-caret')}>
-              {/* Top Banner ONLY for explicit formal documents/letters */}
-              {isDoc && !streaming && (
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/5 p-3 shadow-xs">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-primary">
-                    <FileText className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                    <span className="truncate max-w-[200px] sm:max-w-[300px]">{docTitle}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { downloadAsWord(body, docTitle) }}
-                      className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
-                    >
-                      <FileDown className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                      <span>Download Word (.docx)</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadAsPdf(body, docTitle)}
-                      className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
-                    >
-                      <Download className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Download PDF</span>
-                    </Button>
-                  </div>
+    <>
+      <DocumentPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        content={body}
+      />
+      <div className="iroko-fade-up group px-4 py-2.5 sm:px-6 sm:py-3">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/15 sm:flex">
+            <IrokoLogo size={20} />
+          </div>
+          <div className="min-w-0 flex-1 pt-0.5">
+            {message.error ? (
+              <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                  <p className="font-medium">Something went wrong</p>
+                  <p className="text-destructive/80">{message.error}</p>
                 </div>
-              )}
+              </div>
+            ) : (
+              <div className={cn(streaming && message.content.length === 0 && 'iroko-caret')}>
+                {/* Top Banner ONLY for explicit formal documents/letters */}
+                {isDoc && !streaming && (
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/5 p-3 shadow-xs">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-primary">
+                      <FileText className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                      <span className="truncate max-w-[180px] sm:max-w-[280px]">{docTitle}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsPreviewOpen(true)}
+                        className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
+                      >
+                        <FileText className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>Preview Artifact</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => { downloadAsWord(body, docTitle) }}
+                        className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
+                      >
+                        <FileDown className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                        <span>Word (.docx)</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => downloadAsPdf(body, docTitle)}
+                        className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>PDF</span>
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
               {/* Render document inside an artifact paper card if it is an explicit document */}
               <div className={cn(isDoc && 'rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs')}>
@@ -221,5 +239,6 @@ export function ChatMessageItem({
         </div>
       </div>
     </div>
+    </>
   )
 }

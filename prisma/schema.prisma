@@ -72,15 +72,17 @@ model ServiceTask {
 }
 
 model TaskDocument {
-  id        String      @id @default(cuid())
-  taskId    String
-  kind      String
-  label     String
-  filename  String
-  mimeType  String
-  data      Bytes
-  createdAt DateTime    @default(now())
-  task      ServiceTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  id          String      @id @default(cuid())
+  taskId      String
+  kind        String
+  label       String
+  filename    String
+  mimeType    String
+  data        Bytes?
+  fileUrl     String?
+  storagePath String?
+  createdAt   DateTime    @default(now())
+  task        ServiceTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@index([taskId])
 }
