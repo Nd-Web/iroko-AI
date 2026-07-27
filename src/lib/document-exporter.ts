@@ -27,7 +27,7 @@ import {
 
 /** Check if text content is a formal legal document, contract, or formal letter. */
 export function isLegalDocument(text: string): boolean {
-  if (!text || text.length < 150) return false
+  if (!text || typeof text !== 'string' || text.length < 150) return false
 
   // 1. Explicit document heading (# TENANCY AGREEMENT, # DEMAND NOTICE, etc.)
   const hasDocHeading =
@@ -64,6 +64,7 @@ export function isLegalDocument(text: string): boolean {
 
 /** Extract document title from markdown heading or first line. */
 export function extractDocTitle(text: string): string {
+  if (!text || typeof text !== 'string') return 'Iroko_Document'
   const match = text.match(/^#\s+(.+)$/m)
   if (match?.[1]) {
     return match[1].replace(/[*_#]/g, '').trim()
@@ -93,6 +94,7 @@ export function extractDocTitle(text: string): string {
  * but should NOT appear in the downloadable document.
  */
 export function stripDisclaimerForExport(text: string): string {
+  if (!text || typeof text !== 'string') return ''
   let cleaned = text
 
   // Remove the Iroko AI disclaimer paragraph (italic or plain)

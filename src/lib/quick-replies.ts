@@ -20,6 +20,9 @@ export interface QuickReplyParse {
 }
 
 export function extractQuickReplies(content: string): QuickReplyParse {
+  if (!content || typeof content !== 'string') {
+    return { body: '', options: [] }
+  }
   let options: string[] = []
 
   // Remove every complete ```options block; keep the last block's choices.

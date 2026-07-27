@@ -31,11 +31,13 @@ export function ChatMessageItem({
   const [copied, setCopied] = React.useState(false)
   const isUser = message.role === 'user'
 
+  const rawContent = typeof message?.content === 'string' ? message.content : ''
+
   // Strip the trailing ```options block from the body and surface its
   // choices as tappable chips (chat-first buttons).
   const { body, options } = React.useMemo(
-    () => (isUser ? { body: message.content, options: [] } : extractQuickReplies(message.content)),
-    [isUser, message.content],
+    () => (isUser ? { body: rawContent, options: [] } : extractQuickReplies(rawContent)),
+    [isUser, rawContent],
   )
 
   const isDoc = React.useMemo(() => !isUser && isLegalDocument(body), [isUser, body])

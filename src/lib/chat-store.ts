@@ -13,6 +13,7 @@ export function uid(): string {
 
 /** Derive a short conversation title from the first user message */
 export function deriveTitle(text: string): string {
+  if (!text || typeof text !== 'string') return 'New chat'
   const clean = text.replace(/\s+/g, ' ').trim()
   if (!clean) return 'New chat'
   const words = clean.split(' ').slice(0, 7).join(' ')
@@ -69,7 +70,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         messages: (c.messages || []).map((m: any) => ({
           id: m.id,
           role: m.role,
-          content: m.content,
+          content: typeof m.content === 'string' ? m.content : '',
           createdAt: new Date(m.createdAt).getTime(),
         })),
       }))
