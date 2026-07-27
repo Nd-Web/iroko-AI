@@ -30,6 +30,13 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
+    const cleanEmail = email.trim().toLowerCase()
+
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      setError('Please enter a valid email address.')
+      return
+    }
+
     if (password.length < 8) {
       setError('Password must be at least 8 characters.')
       return
@@ -42,32 +49,35 @@ export default function RegisterPage() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           name: name.trim() || undefined,
-          email: email.trim().toLowerCase(),
+          email: cleanEmail,
           password,
         }),
       })
+
       const data = await res.json()
+
       if (!res.ok) {
-        setError(data?.error || 'Could not create your account.')
+        setError(data?.error || 'Could not create your account. Please try again.')
         setLoading(false)
         return
       }
 
-      // Auto sign-in right after a successful signup.
+      // Automatically sign in and navigate straight to the chat app /
       const signInRes = await signIn('credentials', {
-        email: email.trim().toLowerCase(),
+        email: cleanEmail,
         password,
         redirect: false,
+        callbackUrl: '/',
       })
-      if (!signInRes || signInRes.error) {
-        // Account created but auto sign-in failed — send to login page
+
+      if (signInRes && !signInRes.error) {
+        router.push('/')
+        router.refresh()
+      } else {
         router.push('/login?registered=true')
-        return
       }
-      router.push('/')
-      router.refresh()
     } catch {
-      setError('Something went wrong. Please try again.')
+      setError('Connection issue. Please check your network and try again.')
       setLoading(false)
     }
   }

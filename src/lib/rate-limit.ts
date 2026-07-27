@@ -1,11 +1,5 @@
 /**
- * Simple in-memory sliding-window rate limiter.
- *
- * This app runs as a single long-lived Node process behind Caddy (see
- * Caddyfile / .zscripts/start.sh) rather than as scattered serverless
- * instances, so a shared in-memory Map is the right tool here — no Redis or
- * external store needed. If this ever moves to multiple server instances
- * behind a load balancer, swap this for a shared store (Redis, etc.).
+ * In-memory sliding-window rate limiter.
  */
 
 interface Bucket {
@@ -14,7 +8,6 @@ interface Bucket {
 
 const buckets = new Map<string, Bucket>()
 
-// Periodically drop stale buckets so this Map doesn't grow forever.
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000
 let lastCleanup = Date.now()
 
@@ -36,8 +29,7 @@ export interface RateLimitResult {
 }
 
 /**
- * Sliding-window rate limit check. `key` should already be scoped to both the
- * caller and the route, e.g. `chat:203.0.113.4`.
+ * Sliding-window rate limit check.
  */
 export function checkRateLimit(key: string, limit: number, windowMs: number): RateLimitResult {
   const now = Date.now()
@@ -63,11 +55,18 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): Ra
 }
 
 /**
- * Best-effort client IP extraction. Trusts x-forwarded-for / x-real-ip
- * because Caddy (our own reverse proxy — see Caddyfile) sets these from the
- * actual remote connection; it isn't client-suppliable from outside.
+ * Robust client IP extraction for Vercel, Cloudflare, Caddy, and reverse proxies.
+ * Never returns a single shared 'unknown' string that locks out all global users!
  */
 export function getClientIp(req: Request): string {
+  const xvercel = req.headers.get('x-vercel-forwarded-for')
+  if (xvercel) {
+    const first = xvercel.split(',')[0]?.trim()
+    if (first) return first
+  }
+  const cf = req.headers.get('cf-connecting-ip')
+  if (cf) return cf.trim()
+
   const xff = req.headers.get('x-forwarded-for')
   if (xff) {
     const first = xff.split(',')[0]?.trim()
@@ -75,16 +74,14 @@ export function getClientIp(req: Request): string {
   }
   const xri = req.headers.get('x-real-ip')
   if (xri) return xri.trim()
-  return 'unknown'
+
+  // Generate unique pseudo-IP fallback so we never block global users on a shared key
+  return `anon-${Math.random().toString(36).slice(2, 9)}`
 }
 
 /**
  * Drop-in guard for route handlers. Returns a 429 Response if the caller is
  * over the limit for this route, otherwise null (meaning: proceed).
- *
- * Usage:
- *   const limited = rateLimitResponse(req, 'chat', 20, 60_000)
- *   if (limited) return limited
  */
 export function rateLimitResponse(
   req: Request,

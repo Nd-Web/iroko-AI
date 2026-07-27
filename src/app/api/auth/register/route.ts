@@ -6,16 +6,15 @@ import { rateLimitResponse } from '@/lib/rate-limit'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export async function POST(req: NextRequest) {
-  // 5 signups/minute/IP — signup is rare per real user, so a tight limit
-  // here mainly stops automated account-creation abuse.
-  const limited = rateLimitResponse(req, 'register', 5, 60_000)
+  // Generous rate limit (30 signups / min / IP) to allow real user signups without blocking
+  const limited = rateLimitResponse(req, 'register', 30, 60_000)
   if (limited) return limited
 
   let body: any
   try {
     body = await req.json()
   } catch {
-    return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
+    return Response.json({ error: 'Invalid JSON request body.' }, { status: 400 })
   }
 
   const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
@@ -32,26 +31,27 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const existing = await db.user.findUnique({ where: { email } })
-  if (existing) {
-    return Response.json(
-      { error: 'An account with this email already exists.' },
-      { status: 409 },
-    )
-  }
-
-  const passwordHash = await bcrypt.hash(password, 12)
-
   try {
+    const existing = await db.user.findUnique({ where: { email } })
+    if (existing) {
+      return Response.json(
+        { error: 'An account with this email already exists. Please log in instead.' },
+        { status: 409 },
+      )
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12)
+
     const user = await db.user.create({
       data: { email, passwordHash, name },
       select: { id: true, email: true },
     })
+
     return Response.json({ ok: true, userId: user.id })
-  } catch (err) {
-    console.error('[auth/register] error:', err)
+  } catch (err: any) {
+    console.error('[auth/register] CRITICAL DATABASE ERROR:', err?.message || err, err?.stack)
     return Response.json(
-      { error: 'Could not create the account. Please try again.' },
+      { error: err?.message || 'Database error creating account. Please try again.' },
       { status: 500 },
     )
   }
