@@ -98,11 +98,11 @@ export function ChatMessageItem({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => downloadAsWord(body, docTitle)}
+                      onClick={() => { downloadAsWord(body, docTitle) }}
                       className="h-8 gap-1.5 rounded-lg text-xs font-medium bg-background border-border hover:bg-accent"
                     >
                       <FileDown className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                      <span>Download Word (.doc)</span>
+                      <span>Download Word (.docx)</span>
                     </Button>
                     <Button
                       variant="outline"
@@ -184,7 +184,7 @@ export function ChatMessageItem({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => downloadAsWord(body, docTitle)}
+                onClick={() => { downloadAsWord(body, docTitle) }}
                 className="h-7 gap-1.5 px-2 text-xs text-muted-foreground hover:text-foreground"
                 title="Export message as Word document"
               >
